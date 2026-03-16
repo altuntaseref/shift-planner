@@ -43,7 +43,7 @@ export default function HomePage() {
             <LeftSidebar />
 
             {/* Center Area: Planning Workspace */}
-            <main className="flex-1 flex flex-col bg-slate-50 dark:bg-slate-900 overflow-y-auto">
+            <main className="flex-1 flex flex-col bg-slate-100 dark:bg-slate-900 overflow-y-auto">
                 <div className="p-8">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                         <div>
@@ -129,17 +129,17 @@ export default function HomePage() {
                                 ))}
                             </div>
                         ) : (
-                            <div className="min-h-[200px] border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center text-center p-8 bg-white/30">
+                            <div className="min-h-[200px] border border-slate-200 dark:border-slate-700 rounded-2xl flex flex-col items-center justify-center text-center p-8 bg-white dark:bg-slate-800 shadow-sm">
                                 <span className="material-symbols-outlined text-slate-300 text-4xl mb-2">history</span>
-                                <p className="text-slate-400 text-sm font-medium">Henüz yayınlanmış bir plan bulunmuyor.</p>
+                                <p className="text-slate-500 text-sm font-medium">Henüz yayınlanmış bir plan bulunmuyor.</p>
                             </div>
                         )}
                     </div>
 
                     {sortedHistory.length === 0 && (
                         <div className="grid grid-cols-1 gap-6">
-                            <div className="min-h-[400px] border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl flex flex-col items-center justify-center bg-white/50 dark:bg-slate-800/50 p-12 text-center">
-                                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-slate-400 mb-4 shadow-sm border border-slate-100">
+                            <div className="min-h-[400px] border border-slate-200 dark:border-slate-700 rounded-2xl flex flex-col items-center justify-center bg-white dark:bg-slate-800 shadow-sm p-12 text-center">
+                                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center text-slate-400 mb-4 shadow-sm">
                                     <span className="material-symbols-outlined text-3xl">view_kanban</span>
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300 underline decoration-primary/30 underline-offset-4">Planlama Alanı Boş</h3>

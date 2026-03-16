@@ -57,14 +57,6 @@ export default function Header() {
                     </select>
                 </div>
 
-                <div className="flex gap-2">
-                    <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors">
-                        <span className="material-symbols-outlined">notifications</span>
-                    </button>
-                    <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors">
-                        <span className="material-symbols-outlined">settings</span>
-                    </button>
-                </div>
             </div>
         </header>
     );

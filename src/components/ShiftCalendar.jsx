@@ -1,14 +1,17 @@
 import React from 'react';
 
-const DAY_NAMES = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+const DAY_NAMES = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+const SHORT_DAY_NAMES = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
 
 export default function ShiftCalendar({ plan, onAssignmentClick, selectedAssignments = [] }) {
     if (!plan || !plan.dailyShifts || plan.dailyShifts.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[400px] border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-gray-50/50 p-12 text-center">
-                <span className="material-symbols-outlined text-4xl text-slate-400 mb-4">calendar_month</span>
-                <h3 className="text-lg font-bold text-slate-700">Plan Yükleniyor...</h3>
-                <p className="text-sm text-slate-500 mt-2 max-w-sm">Henüz bir plan verisi mevcut değil. Lütfen bekleyin veya yeni bir plan oluşturun.</p>
+            <div className="flex flex-col items-center justify-center min-h-[400px] border-4 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl bg-white dark:bg-slate-900/50 p-12 text-center animate-pulse">
+                <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-4">
+                    <span className="material-symbols-outlined text-3xl text-slate-300">hourglass_empty</span>
+                </div>
+                <h3 className="text-xl font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Plan Yükleniyor</h3>
+                <p className="text-sm text-slate-400 mt-2 max-w-xs font-semibold">Sistem verileri analiz ediyor ve takvimi hazırlıyor. Lütfen bekleyin.</p>
             </div>
         );
     }
@@ -63,67 +66,88 @@ export default function ShiftCalendar({ plan, onAssignmentClick, selectedAssignm
     };
 
     return (
-        <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-enterprise-border overflow-hidden">
-            {/* Header */}
-            <div className="bg-white border-b border-enterprise-border grid grid-cols-7 text-center py-3">
-                {DAY_NAMES.map((name, i) => (
-                    <div key={name} className={`text-xs font-bold uppercase ${i >= 5 ? 'text-red-400' : 'text-enterprise-secondary'}`}>
+        <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-2xl overflow-hidden shadow-2xl border border-white dark:border-slate-700">
+            {/* Header: Days of Week */}
+            <div className="grid grid-cols-7 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+                {SHORT_DAY_NAMES.map((name, i) => (
+                    <div key={name} className={`py-4 text-center text-[10px] font-black uppercase tracking-[0.2em] ${i >= 5 ? 'text-red-500' : 'text-slate-400'}`}>
                         {name}
                     </div>
                 ))}
             </div>
 
-            {/* Grid */}
-            <div className="grid grid-cols-7 gap-[1px] bg-slate-200">
+            {/* Calendar Body */}
+            <div className="grid grid-cols-7 gap-px">
                 {cells.map((cell) => {
                     if (cell.type === 'empty') {
-                        return <div key={cell.key} className="min-h-[100px] bg-gray-50/40" />;
+                        return <div key={cell.key} className="min-h-[140px] bg-slate-50 dark:bg-slate-900/40 opacity-50" />;
                     }
-
-                    // Dinamik class'lar
-                    let dayBg = 'bg-white';
-                    if (cell.isWeekend) dayBg = 'bg-gray-50/50';
-                    if (cell.isHoliday) dayBg = 'bg-red-50/20';
 
                     const assignments = cell.shift?.assignments || [];
                     const primaryAssignment = assignments.find(a => a.role === 'PRIMARY');
                     const backupAssignments = assignments.filter(a => a.role !== 'PRIMARY');
 
                     return (
-                        <div key={cell.key} className={`min-h-[100px] p-2 flex flex-col gap-1 border-r border-b border-transparent ${dayBg} relative group hover:bg-slate-50 transition-colors`}>
-                            {cell.isToday && <div className="absolute top-0 left-0 right-0 h-1 bg-primary"></div>}
-
-                            <div className={`text-right text-sm font-semibold mb-1 ${(cell.isWeekend || cell.isHoliday) ? 'text-red-400' : 'text-slate-400'}`}>
-                                {cell.day}
-                                {cell.isHoliday && <span className="ml-1 text-[9px] bg-red-100 text-red-600 px-1 py-0.5 rounded uppercase align-middle">Tatil</span>}
-                            </div>
-
-                            {/* ASİL Atama */}
-                            {primaryAssignment ? (
-                                <div
-                                    onClick={(e) => handleAssignmentClick(e, primaryAssignment, cell.shift)}
-                                    className={`rounded p-1 text-[11px] cursor-pointer transition-all border ${selectedAssignments.includes(primaryAssignment.assignmentId) ? 'bg-primary text-white border-primary shadow-md transform scale-[1.02]' : 'bg-blue-50 border-blue-200 hover:border-blue-300'}`}
-                                >
-                                    <span className={`font-bold uppercase ${selectedAssignments.includes(primaryAssignment.assignmentId) ? 'text-blue-100' : 'text-blue-800'}`}>ASİL:</span>
-                                    <span className="ml-1 leading-tight inline-block">{primaryAssignment.employeeFullName || 'Bilinmiyor'}</span>
-                                </div>
-                            ) : (
-                                <div className="rounded p-1 text-[11px] bg-red-50 border border-red-200 text-red-600 border-dashed text-center">
-                                    Atanmadı
-                                </div>
+                        <div 
+                            key={cell.key} 
+                            className={`min-h-[140px] p-3 flex flex-col gap-2 transition-all duration-300 relative group
+                                ${cell.isWeekend ? 'bg-slate-50/50 dark:bg-slate-900/60' : 'bg-white dark:bg-slate-900'}
+                                ${cell.isHoliday ? 'bg-red-50/30' : ''}
+                                hover:bg-primary-light/30 dark:hover:bg-primary-dark/10
+                            `}
+                        >
+                            {/* Today Indicator */}
+                            {cell.isToday && (
+                                <div className="absolute top-0 left-0 right-0 h-1 bg-primary z-10 shadow-[0_0_8px_rgba(19,91,236,0.5)]"></div>
                             )}
 
-                            {/* YEDEK Atama(lar) */}
-                            {backupAssignments.map(backup => (
-                                <div
-                                    key={backup.assignmentId}
-                                    onClick={(e) => handleAssignmentClick(e, backup, cell.shift)}
-                                    className={`rounded p-1 text-[11px] cursor-pointer transition-all border mt-[2px] ${selectedAssignments.includes(backup.assignmentId) ? 'bg-primary text-white border-primary shadow-md transform scale-[1.02]' : 'bg-gray-50 border-gray-200 hover:border-gray-300'}`}
-                                >
-                                    <span className={`font-bold uppercase ${selectedAssignments.includes(backup.assignmentId) ? 'text-blue-100' : 'text-gray-600'}`}>YEDEK:</span>
-                                    <span className="ml-1 leading-tight inline-block text-slate-600">{backup.employeeFullName || 'Bilinmiyor'}</span>
+                            {/* Date Number & Badge */}
+                            <div className="flex justify-between items-start mb-1">
+                                <div className={`px-2 py-0.5 rounded-lg text-xs font-black tracking-tight ${cell.isToday ? 'bg-primary text-white shadow-md' : (cell.isWeekend || cell.isHoliday ? 'text-red-500' : 'text-slate-300 group-hover:text-slate-600')}`}>
+                                    {cell.day}
                                 </div>
-                            ))}
+                                {cell.isHoliday && (
+                                    <div className="bg-red-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shadow-sm">Tatil</div>
+                                )}
+                            </div>
+
+                            {/* Assignments Stack */}
+                            <div className="flex flex-col gap-1.5 flex-1 mt-1">
+                                {primaryAssignment ? (
+                                    <button
+                                        onClick={(e) => handleAssignmentClick(e, primaryAssignment, cell.shift)}
+                                        className={`w-full text-left rounded-xl p-2.5 transition-all group/tag relative overflow-hidden flex flex-col gap-0.5 border-2
+                                            ${selectedAssignments.includes(primaryAssignment.assignmentId) 
+                                                ? 'bg-primary border-primary text-white shadow-lg -translate-y-0.5 scale-[1.02]' 
+                                                : 'bg-white dark:bg-slate-800 border-slate-50 dark:border-slate-700 hover:border-primary/30 hover:bg-slate-50'}`}
+                                    >
+                                        <div className={`text-[8px] font-black uppercase tracking-widest ${selectedAssignments.includes(primaryAssignment.assignmentId) ? 'text-white/70' : 'text-primary'}`}>Asil Nöbet</div>
+                                        <div className={`text-[11px] font-bold truncate ${selectedAssignments.includes(primaryAssignment.assignmentId) ? 'text-white' : 'text-slate-700 dark:text-slate-200'}`}>
+                                            {primaryAssignment.employeeFullName || '---'}
+                                        </div>
+                                    </button>
+                                ) : (
+                                    <div className="rounded-xl p-2.5 bg-red-50/50 border-2 border-dashed border-red-100 flex items-center justify-center">
+                                        <span className="text-[10px] font-black text-red-300 uppercase tracking-widest">Boş Slot</span>
+                                    </div>
+                                )}
+
+                                {backupAssignments.map(backup => (
+                                    <button
+                                        key={backup.assignmentId}
+                                        onClick={(e) => handleAssignmentClick(e, backup, cell.shift)}
+                                        className={`w-full text-left rounded-xl p-2.5 transition-all group/tag flex flex-col gap-0.5 border-2
+                                            ${selectedAssignments.includes(backup.assignmentId) 
+                                                ? 'bg-primary border-primary text-white shadow-lg -translate-y-0.5 scale-[1.02]' 
+                                                : 'bg-slate-100/50 dark:bg-slate-800/50 border-transparent hover:border-slate-200 hover:bg-slate-100'}`}
+                                    >
+                                        <div className={`text-[8px] font-black uppercase tracking-widest ${selectedAssignments.includes(backup.assignmentId) ? 'text-white/70' : 'text-slate-400'}`}>Yedek</div>
+                                        <div className={`text-[11px] font-bold truncate opacity-80 ${selectedAssignments.includes(backup.assignmentId) ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`}>
+                                            {backup.employeeFullName || '---'}
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     );
                 })}

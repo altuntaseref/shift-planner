@@ -84,7 +84,7 @@ export default function PlanPage() {
     const conflicts = 0; // Simulated conflicts logic here
 
     return (
-        <div className="flex flex-col h-full overflow-hidden bg-gray-50">
+        <div className="flex flex-col flex-1 overflow-hidden bg-gray-50">
             {/* Top Toolbar specific to Draft Page */}
             <header className="bg-white border-b border-enterprise-border h-16 flex items-center justify-between px-6 shrink-0 shadow-sm">
                 <div className="flex items-center gap-4">
@@ -108,11 +108,11 @@ export default function PlanPage() {
                 </div>
             </header>
 
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 min-h-0">
                 <LeftSidebar />
 
                 {/* Center Main Area (Calendar View) */}
-                <main className="flex-1 overflow-y-auto bg-gray-50 p-6 flex flex-col relative">
+                <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
 
                     {/* Mode Alerts */}
                     {swapMode && (
@@ -152,7 +152,7 @@ export default function PlanPage() {
                 </main>
 
                 {/* Right Sidebar (Actions) */}
-                <aside className="w-64 bg-white border-l border-enterprise-border p-6 flex flex-col gap-4 shrink-0" id="action-panel">
+                <aside className="w-64 bg-white border-l border-enterprise-border p-6 flex flex-col gap-4 shrink-0 overflow-y-auto" id="action-panel">
                     <div className="text-xs font-bold text-enterprise-secondary uppercase tracking-widest mb-2">Aksiyonlar</div>
 
                     {isDraft && (

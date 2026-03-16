@@ -68,6 +68,22 @@ export function AppProvider({ children }) {
     }, [fetchPlanHistory, fetchEmployees]);
 
     const generatePlan = useCallback(async () => {
+        // --- Client-side pre-validation ---
+        if (employees.length === 0) {
+            setError('Plan oluşturulamıyor: Sistemde hiç aktif çalışan bulunmuyor. Lütfen önce sol panelden çalışan ekleyin.');
+            return null;
+        }
+        const duplicate = planHistory.find(
+            p => p.periodYear === targetYear && p.periodMonth === targetMonth
+        );
+        if (duplicate) {
+            setError(
+                duplicate.status === 'PUBLISHED'
+                    ? `${targetMonth}/${targetYear} dönemi için zaten yayınlanmış bir plan mevcut. Bu dönemin planını değiştirmek için önce ilgili planı açın.`
+                    : `${targetMonth}/${targetYear} dönemi için zaten bir taslak plan mevcut. Önce mevcut taslağı inceleyin.`
+            );
+            return null;
+        }
         setLoading(true);
         setError(null);
         try {
@@ -84,7 +100,7 @@ export function AppProvider({ children }) {
         } finally {
             setLoading(false);
         }
-    }, [targetYear, targetMonth]);
+    }, [targetYear, targetMonth, employees, planHistory]);
 
     const fetchPlan = useCallback(async (id) => {
         setLoading(true);
@@ -102,7 +118,7 @@ export function AppProvider({ children }) {
         if (!currentPlan) return;
         setLoading(true);
         try {
-            await api.publishShiftPlan(currentPlan.planId);
+            await api.publishShiftPlan(currentPlan.planId || currentPlan.id);
             setCurrentPlan((prev) => ({ ...prev, status: 'PUBLISHED' }));
             setSuccessMsg('Plan başarıyla yayınlandı! Çalışanlara mail gönderildi.');
             // Refresh plan history
@@ -119,9 +135,9 @@ export function AppProvider({ children }) {
         if (!currentPlan) return;
         setLoading(true);
         try {
-            await api.swapShifts(currentPlan.planId, firstAssignmentId, secondAssignmentId);
+            await api.swapShifts(currentPlan.planId || currentPlan.id, firstAssignmentId, secondAssignmentId);
             // Refresh the plan
-            const data = await api.getShiftPlanById(currentPlan.planId);
+            const data = await api.getShiftPlanById(currentPlan.planId || currentPlan.id);
             setCurrentPlan(data);
             setSuccessMsg('Takas işlemi başarıyla tamamlandı!');
         } catch (err) {
@@ -135,8 +151,8 @@ export function AppProvider({ children }) {
         if (!currentPlan) return;
         setLoading(true);
         try {
-            await api.replaceShiftEmployee(currentPlan.planId, assignmentId);
-            const data = await api.getShiftPlanById(currentPlan.planId);
+            await api.replaceShiftEmployee(currentPlan.planId || currentPlan.id, assignmentId);
+            const data = await api.getShiftPlanById(currentPlan.planId || currentPlan.id);
             setCurrentPlan(data);
             setSuccessMsg('Asil nöbetçi başarıyla yedekle değiştirildi!');
         } catch (err) {
@@ -161,7 +177,7 @@ export function AppProvider({ children }) {
         loading, error, successMsg,
         targetYear, targetMonth,
         setTargetYear, setTargetMonth,
-        setCurrentPlan,
+        setCurrentPlan, setError,
         fetchEmployees, fetchLeaves, fetchHolidays, fetchPlanHistory,
         generatePlan, fetchPlan, publishPlan,
         swapShifts, replacePrimary, createLeave,
