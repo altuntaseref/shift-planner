@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shift-planner-ui
+  namespace: ocean
+spec:
+  selector:
+    matchLabels:
+      app: shift-planner-ui
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: shift-planner-ui
+        namespace: ocean
+    spec:
+      imagePullSecrets:
+      - name: registry
+      containers:
+      - name: shift-planner-ui
+        image: nexus.ocean.yildiz.domain:8443/shift-planner-ui/app:IMAGE_TAG
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shift-planner-ui
+  namespace: ocean
+spec:
+  selector:
+    app: shift-planner-ui
+  ports:
+  - protocol: TCP
+    name: http
+    port: 80
+    targetPort: 3000
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: shift-planner-ui
+  namespace: ocean
+spec:
+  rules:
+  - host: shift-planner-ui.apps.ocean-octest.yildiz.domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: shift-planner-ui
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - shift-planner-ui.apps.ocean-octest.yildiz.domain
+    secretName: console-tls
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: shift-planner-ui
+  namespace: ocean
+spec:
+  host: shift-planner-ui.apps.ocean-octest.yildiz.domain
+  to:
+    kind: Service
+    name: shift-planner-ui
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
